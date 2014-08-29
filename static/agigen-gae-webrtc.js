@@ -1,4 +1,4 @@
-/* global define, module, webkitRTCPeerConnection, RTCSessionDescription, RTCIceCandidate */
+/* global define, module */
 (function (factory) {
     "use strict";
     if ( typeof define === 'function' && define.amd ) {
@@ -16,7 +16,11 @@
 
 "use strict";
 
-var Peer, debug, RTC, servers;
+var Peer, PeerConnection, SessionDescription, IceCandidate, debug, RTC, servers;
+
+PeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+SessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription || window.webkitRTCSessionDescription;
+IceCandidate = window.RTCIceCandidate || window.mozRTCIceCandidate || window.webkitRTCIceCandidate;
 
 debug = (function(doDebug) {
     return doDebug ? console.log.bind(console) : function() {};
@@ -76,7 +80,7 @@ Peer = function() {
 
         debug('Creating Peer Connection');
 
-        this.connection = connection = new webkitRTCPeerConnection(servers);
+        this.connection = connection = new PeerConnection(servers);
 
         handleSendChannelStateChange = function () {
             var readyState = sendChannel.readyState;
@@ -189,7 +193,7 @@ Peer = function() {
     Peer.prototype.onHandshakeEvent = function(handshake) {
         debug('Got ' + handshake.event + ' handshake');
         if (handshake.event == 'description') {
-            var description = new RTCSessionDescription(JSON.parse(handshake.description));
+            var description = new SessionDescription(JSON.parse(handshake.description));
 
             debug('RECEIVE: Received description from server', description);
 
@@ -204,7 +208,7 @@ Peer = function() {
             }
         }
         else if (handshake.event == 'ice_candidate') {
-            var candidate = new RTCIceCandidate(JSON.parse(handshake.candidate));
+            var candidate = new IceCandidate(JSON.parse(handshake.candidate));
             debug('RECEIVE: Received ice candidate from server', candidate);
             this.iceCandidates.push(candidate);
 
