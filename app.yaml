@@ -1,0 +1,22 @@
+application: gae-webrtc
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+# low expiration for non cache busted assets
+default_expiration: 0s
+
+libraries:
+- name: webapp2
+  version: latest
+
+handlers:
+
+# static
+- url: /static
+  static_dir: static
+
+# main
+- url: /.*
+  script: main.app
